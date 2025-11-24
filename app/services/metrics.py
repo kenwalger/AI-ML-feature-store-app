@@ -63,7 +63,7 @@ class MetricsService:
         return {
             "total_features": total_features,
             "follower_pool_enabled": settings.use_follower_pool,
-            "follower_pool_available": follower_engine is not None,
+            "follower_pool_available": follower_available,
             "database_connections": db_connections,
             "recent_query_latency_ms": self.get_average_latency()
         }

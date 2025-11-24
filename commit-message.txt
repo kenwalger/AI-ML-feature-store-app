@@ -1,12 +1,13 @@
-Fix static asset paths for frontend deployment
+Fix stats endpoint NameError for follower_engine
 
-The frontend was building successfully but assets (JS/CSS) weren't loading
-because of a path mismatch. Vite was building with base path '/' but FastAPI
-serves static files from '/static'.
+The stats endpoint was failing with NameError because metrics.py was
+still referencing the old follower_engine module variable, which was
+refactored to use lazy initialization functions.
 
 Fix:
-- Configure Vite to use '/static/' as the base path
-- Update FastAPI to properly mount the assets directory
-- Assets will now be served from /static/assets/... matching the HTML references
+- Update metrics service to use _create_follower_engine() function
+- Add proper error handling for follower engine availability check
+- Stats endpoint now works correctly without runtime errors
 
-The frontend should now load completely with all assets working correctly.
+This resolves the 500 errors on /api/stats that were causing console
+errors in the frontend.
