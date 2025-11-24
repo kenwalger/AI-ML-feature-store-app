@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app.models.feature import Feature
 from app.config import settings
-from app.database import follower_engine, primary_engine
+from app.database import _create_follower_engine, _create_primary_engine
 from typing import Optional
 import time
 
@@ -33,14 +33,30 @@ class MetricsService:
         total_features = db.query(func.count(Feature.id)).scalar() or 0
         
         # Check database connections
+        try:
+            primary = _create_primary_engine()
+            primary_available = primary is not None
+            primary_pool_size = primary.pool.size() if primary else 0
+        except Exception:
+            primary_available = False
+            primary_pool_size = 0
+        
+        try:
+            follower = _create_follower_engine()
+            follower_available = follower is not None
+            follower_pool_size = follower.pool.size() if follower else 0
+        except Exception:
+            follower_available = False
+            follower_pool_size = 0
+        
         db_connections = {
             "primary": {
-                "available": primary_engine is not None,
-                "pool_size": primary_engine.pool.size() if primary_engine else 0
+                "available": primary_available,
+                "pool_size": primary_pool_size
             },
             "follower": {
-                "available": follower_engine is not None,
-                "pool_size": follower_engine.pool.size() if follower_engine else 0
+                "available": follower_available,
+                "pool_size": follower_pool_size
             }
         }
         

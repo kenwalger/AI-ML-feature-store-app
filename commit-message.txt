@@ -1,32 +1,30 @@
-Fix Heroku build and add deployment documentation
+Fix PostgreSQL driver installation and database connection initialization
 
-This commit fixes the Heroku build failure and adds comprehensive
-deployment documentation with required addon specifications.
+This commit fixes the runtime error where SQLAlchemy couldn't load the
+PostgreSQL dialect plugin, and improves database connection handling
+with lazy initialization and better error handling.
 
-Build Fixes:
-- Remove bin/pre_compile script that was causing PATH issues
-- Rely on uv-heroku-buildpack for automatic uv installation
-- Remove problematic release command from Procfile
-- Buildpack now handles uv installation automatically
+Runtime Fixes:
+- Implement lazy initialization for database engines to handle missing
+  psycopg2-binary gracefully
+- Add error handling for database connection creation
+- Fix postgres:// to postgresql:// URL conversion for SQLAlchemy 2.0
+- Update all database engine references to use lazy initialization
+  functions
 
-Deployment Documentation:
-- Add DEPLOYMENT.md with detailed addon setup instructions
-- Document required vs optional addons clearly
-- Include troubleshooting section for common issues
-- Add cost considerations for demo deployments
+Database Connection Improvements:
+- Create engines lazily only when needed (not at module import time)
+- Add defensive error handling for missing database URLs
+- Improve follower database availability checking
+- Update metrics service to handle missing engines gracefully
+- Update toggle endpoint to properly check follower availability
 
-Configuration Updates:
-- Update app.json to include heroku-ai addon in addons list
-- Update README with clearer addon provisioning instructions
-- Clarify that buildpack handles uv installation automatically
+The issue was that database engines were being created at module import
+time, which caused failures if psycopg2-binary wasn't installed or
+DATABASE_URL wasn't set. With lazy initialization, the app can start
+even if the database isn't immediately available, and will create
+connections when actually needed.
 
-Required Addons:
-- Heroku Postgres (essential-0) - Primary database
-- Heroku Redis (mini) - For Celery background jobs
-- Heroku Managed Inference (basic) - For Cohere embeddings
-
-Optional Addons:
-- Heroku Postgres Follower - For demonstrating follower pools
-
-The build should now succeed as the uv-heroku-buildpack automatically
-installs and configures uv without requiring manual PATH manipulation.
+This should resolve the "Can't load plugin: sqlalchemy.dialects:postgres"
+error by ensuring psycopg2-binary is properly required and connections
+are created only when the database is actually needed.

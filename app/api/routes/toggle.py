@@ -2,7 +2,7 @@
 from fastapi import APIRouter, HTTPException
 from app.models.schemas import ToggleResponse
 from app.config import settings
-from app.database import follower_engine
+from app.database import _create_follower_engine
 
 router = APIRouter(prefix="/api/toggle", tags=["toggle"])
 
@@ -23,10 +23,17 @@ async def toggle_follower_pool(enabled: bool = None):
     
     If enabled is None, toggles current state.
     """
-    if follower_engine is None:
+    try:
+        follower_engine = _create_follower_engine()
+        if follower_engine is None:
+            raise HTTPException(
+                status_code=400,
+                detail="Follower database is not configured. Set FOLLOWER_DATABASE_URL environment variable."
+            )
+    except Exception as e:
         raise HTTPException(
             status_code=400,
-            detail="Follower database is not configured. Set FOLLOWER_DATABASE_URL environment variable."
+            detail=f"Follower database is not available: {str(e)}"
         )
     
     if enabled is None:
