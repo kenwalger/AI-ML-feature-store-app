@@ -55,7 +55,7 @@ export default {
 
   async toggleFollowerPool(enabled) {
     const response = await api.post('/api/toggle/follower', null, {
-      params: { enabled }
+      params: { enabled: enabled }
     })
     return response.data
   }

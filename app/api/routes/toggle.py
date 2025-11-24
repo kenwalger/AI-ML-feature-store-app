@@ -1,5 +1,5 @@
 """Follower pool toggle API routes"""
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from app.models.schemas import ToggleResponse
 from app.config import settings
 from app.database import _create_follower_engine
@@ -17,12 +17,13 @@ async def get_follower_status():
 
 
 @router.post("/follower", response_model=ToggleResponse)
-async def toggle_follower_pool(enabled: bool = None):
+async def toggle_follower_pool(enabled: bool = Query(None)):
     """
     Toggle follower pool usage on/off.
     
     If enabled is None, toggles current state.
     """
+    # Check if follower database is configured
     try:
         follower_engine = _create_follower_engine()
         if follower_engine is None:
@@ -30,6 +31,9 @@ async def toggle_follower_pool(enabled: bool = None):
                 status_code=400,
                 detail="Follower database is not configured. Set FOLLOWER_DATABASE_URL environment variable."
             )
+    except HTTPException:
+        # Re-raise HTTP exceptions
+        raise
     except Exception as e:
         raise HTTPException(
             status_code=400,

@@ -42,11 +42,12 @@ class EmbeddingService:
         async with httpx.AsyncClient() as client:
             # Check if using new Inference API format
             if "inference.heroku.com" in self.base_url:
-                # New Inference API format
+                # New Inference API format (Cohere accepts string or array)
                 url = f"{self.base_url}/v1/embeddings"
+                # Cohere models can accept string or array, but array is more standard
                 payload = {
                     "model": self.model_id,
-                    "input": text
+                    "input": [text] if isinstance(text, str) else text
                 }
             else:
                 # Legacy Heroku AI API format

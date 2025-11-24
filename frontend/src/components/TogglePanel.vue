@@ -83,7 +83,9 @@ export default {
         }, 3000)
       } catch (error) {
         console.error('Failed to toggle follower pool:', error)
-        this.message = 'Failed to toggle follower pool. Please try again.'
+        // Show the actual error message from the backend if available
+        const errorMessage = error.response?.data?.detail || error.message || 'Failed to toggle follower pool. Please try again.'
+        this.message = errorMessage
         // Revert checkbox
         event.target.checked = !newValue
       } finally {
