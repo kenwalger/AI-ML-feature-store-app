@@ -1,27 +1,18 @@
-Fix build warnings and integrate frontend serving
+Configure buildpacks explicitly for frontend build
 
-This commit addresses Heroku build warnings and sets up the frontend
-to be built and served by FastAPI.
+The .buildpacks file wasn't being detected by Heroku, causing only
+the Python buildpack to run and skipping the frontend build.
 
-Build Configuration Fixes:
-- Remove uv.lock file to eliminate package manager conflict warning
-- Replace deprecated runtime.txt with .python-version (3.11)
-- Remove uv-heroku-buildpack (using native Heroku Python buildpack)
-- Add Node.js buildpack for frontend builds
-- Add package.json for frontend build script
+Buildpack Configuration:
+- Set buildpacks explicitly via Heroku CLI
+- Node.js buildpack runs first to build frontend
+- Python buildpack runs second for backend dependencies
+- heroku-postbuild script builds Vue.js frontend automatically
 
-Frontend Integration:
-- Configure FastAPI to serve static frontend files from app/static
-- Add conditional root route: serves frontend if built, API info otherwise
-- Update Vite config to output to app/static directory
-- Update API client to use relative URLs in production
-- Add release phase to build frontend during deployment
+The buildpacks are now configured as:
+1. heroku/nodejs (builds frontend)
+2. heroku/python (installs Python dependencies)
 
-The app will now:
-1. Build the Vue.js frontend during Heroku deployment (release phase)
-2. Serve the frontend UI at the root route when built
-3. Fall back to API info JSON if frontend isn't built
-4. Serve API documentation at /docs and /redoc
-
-This resolves the build warnings and enables the full-stack application
-to work properly on Heroku.
+On the next deployment, the frontend will be built automatically
+during the Node.js buildpack phase via the heroku-postbuild script,
+and the built files will be served by FastAPI at the root route.
