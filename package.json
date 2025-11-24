@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "AI/ML Feature Store - Heroku NGPG Demo",
   "scripts": {
-    "heroku-postbuild": "cd frontend && npm install && npm run build"
+    "heroku-postbuild": "cd frontend && npm install --include=dev && npm run build"
   },
   "engines": {
     "node": "18.x"

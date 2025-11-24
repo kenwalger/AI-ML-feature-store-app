@@ -1,18 +1,12 @@
-Configure buildpacks explicitly for frontend build
+Fix frontend build by including dev dependencies
 
-The .buildpacks file wasn't being detected by Heroku, causing only
-the Python buildpack to run and skipping the frontend build.
+The build was failing because vite (a dev dependency) wasn't being
+installed during the Heroku build process. Heroku sets NODE_ENV=production
+by default, which skips dev dependencies, but we need them for the build.
 
-Buildpack Configuration:
-- Set buildpacks explicitly via Heroku CLI
-- Node.js buildpack runs first to build frontend
-- Python buildpack runs second for backend dependencies
-- heroku-postbuild script builds Vue.js frontend automatically
+Build Fix:
+- Update heroku-postbuild script to use `npm install --include=dev`
+- This ensures vite and other build tools are available during build
+- Production build still only includes production dependencies in final output
 
-The buildpacks are now configured as:
-1. heroku/nodejs (builds frontend)
-2. heroku/python (installs Python dependencies)
-
-On the next deployment, the frontend will be built automatically
-during the Node.js buildpack phase via the heroku-postbuild script,
-and the built files will be served by FastAPI at the root route.
+The frontend will now build successfully on Heroku.
