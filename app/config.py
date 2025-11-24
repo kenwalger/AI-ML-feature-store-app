@@ -11,9 +11,10 @@ class Settings(BaseSettings):
     database_url: str = os.getenv("DATABASE_URL", "")
     follower_database_url: Optional[str] = os.getenv("FOLLOWER_DATABASE_URL")
     
-    # Heroku Managed Inference (Cohere)
-    heroku_ai_api_key: Optional[str] = None
-    heroku_ai_model_id: str = "cohere-embed-english-v3.0"
+    # Heroku Managed Inference (supports both old heroku-ai and new inference addon)
+    heroku_ai_api_key: Optional[str] = os.getenv("HEROKU_AI_API_KEY") or os.getenv("INFERENCE_KEY")
+    heroku_ai_model_id: str = os.getenv("HEROKU_AI_MODEL_ID") or os.getenv("INFERENCE_MODEL_ID", "cohere-embed-english-v3.0")
+    inference_url: Optional[str] = os.getenv("INFERENCE_URL")
     
     # Redis
     redis_url: str = "redis://localhost:6379/0"

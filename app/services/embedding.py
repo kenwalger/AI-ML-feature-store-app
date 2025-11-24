@@ -9,36 +9,51 @@ class EmbeddingService:
     """Service for generating embeddings using Heroku Managed Inference (Cohere)"""
     
     def __init__(self):
-        self.api_key = settings.heroku_ai_api_key or os.getenv("HEROKU_AI_API_KEY")
+        self.api_key = settings.heroku_ai_api_key or os.getenv("INFERENCE_KEY") or os.getenv("HEROKU_AI_API_KEY")
         self.model_id = settings.heroku_ai_model_id
-        self.base_url = "https://api.heroku.com"
+        # Use Inference URL if available, otherwise fall back to Heroku AI API
+        self.base_url = settings.inference_url or os.getenv("INFERENCE_URL") or "https://api.heroku.com"
         
         if not self.api_key:
-            raise ValueError("HEROKU_AI_API_KEY must be set for embedding generation")
+            raise ValueError("INFERENCE_KEY or HEROKU_AI_API_KEY must be set for embedding generation")
     
     def _get_headers(self) -> dict:
         """Get API headers"""
-        return {
-            "Authorization": f"Bearer {self.api_key}",
-            "Accept": "application/vnd.heroku+json; version=3",
-            "Content-Type": "application/json"
-        }
+        # New Inference API uses different header format
+        if "inference.heroku.com" in self.base_url:
+            return {
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json"
+            }
+        else:
+            # Legacy Heroku AI API format
+            return {
+                "Authorization": f"Bearer {self.api_key}",
+                "Accept": "application/vnd.heroku+json; version=3",
+                "Content-Type": "application/json"
+            }
     
     async def generate_embedding(self, text: str) -> List[float]:
         """
         Generate embedding for a single text using Heroku Managed Inference.
         
-        Uses the Heroku AI API endpoint. The API key should be set via
-        HEROKU_AI_API_KEY environment variable or config.
+        Supports both the new Inference API and legacy Heroku AI API.
         """
         async with httpx.AsyncClient() as client:
-            # Heroku Managed Inference API endpoint
-            # Format: https://api.heroku.com/ai/models/{model_id}/call
-            url = f"{self.base_url}/ai/models/{self.model_id}/call"
-            
-            payload = {
-                "input": text
-            }
+            # Check if using new Inference API format
+            if "inference.heroku.com" in self.base_url:
+                # New Inference API format
+                url = f"{self.base_url}/v1/embeddings"
+                payload = {
+                    "model": self.model_id,
+                    "input": text
+                }
+            else:
+                # Legacy Heroku AI API format
+                url = f"{self.base_url}/ai/models/{self.model_id}/call"
+                payload = {
+                    "input": text
+                }
             
             try:
                 response = await client.post(
@@ -51,7 +66,12 @@ class EmbeddingService:
                 data = response.json()
                 
                 # Extract embedding from response
-                # Response format may vary - check for common patterns
+                # New Inference API format: {"data": [{"embedding": [...]}]}
+                if "data" in data and isinstance(data["data"], list) and len(data["data"]) > 0:
+                    if "embedding" in data["data"][0]:
+                        return data["data"][0]["embedding"]
+                
+                # Legacy Heroku AI API format
                 if "embedding" in data:
                     return data["embedding"]
                 elif "output" in data:
