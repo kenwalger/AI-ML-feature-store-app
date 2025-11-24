@@ -1,65 +1,32 @@
-Initial commit: AI/ML Feature Store showcasing Heroku Next Generation PostgreSQL
+Fix Heroku build and add deployment documentation
 
-This commit establishes a production-ready ML feature store application
-demonstrating Heroku's Next Generation PostgreSQL (NGPG) capabilities,
-including pgvector for vector similarity search, follower pools,
-compute/storage decoupling, and high availability.
+This commit fixes the Heroku build failure and adds comprehensive
+deployment documentation with required addon specifications.
 
-Features:
-- Vector similarity search using pgvector extension
-- Follower pool toggle for demonstrating read replica performance
-- High-volume batch ingestion with async processing
-- Real-time performance metrics with Chart.js visualizations
-- Integration with Heroku Managed Inference (Cohere embeddings)
-- FastAPI backend with automatic Swagger/OpenAPI documentation
-- Vue.js 3 frontend with Bootstrap 5 UI
-- Celery workers for background task processing
+Build Fixes:
+- Remove bin/pre_compile script that was causing PATH issues
+- Rely on uv-heroku-buildpack for automatic uv installation
+- Remove problematic release command from Procfile
+- Buildpack now handles uv installation automatically
 
-Backend (FastAPI):
-- Database models with pgvector support (1024-dimensional embeddings)
-- Primary and follower database connection management
-- API endpoints for ingestion, search, stats, and follower toggle
-- Cohere embedding service integration via Heroku AI
-- Mock data generator for cross-industry use cases
-- Performance metrics collection and tracking
+Deployment Documentation:
+- Add DEPLOYMENT.md with detailed addon setup instructions
+- Document required vs optional addons clearly
+- Include troubleshooting section for common issues
+- Add cost considerations for demo deployments
 
-Frontend (Vue.js):
-- Interactive dashboard with Bootstrap styling
-- Follower pool toggle with real-time status
-- Feature ingestion panel with batch support
-- Vector similarity search interface
-- Performance metrics visualization with Chart.js
-- Responsive design for various screen sizes
+Configuration Updates:
+- Update app.json to include heroku-ai addon in addons list
+- Update README with clearer addon provisioning instructions
+- Clarify that buildpack handles uv installation automatically
 
-Infrastructure:
-- uv package manager integration for fast dependency installation
-- Heroku buildpack configuration for automated deployment
-- Celery + Redis for background job processing
-- Environment-based configuration management
-- Database initialization and migration support
+Required Addons:
+- Heroku Postgres (essential-0) - Primary database
+- Heroku Redis (mini) - For Celery background jobs
+- Heroku Managed Inference (basic) - For Cohere embeddings
 
-Testing:
-- pytest test suite with async support
-- API endpoint tests
-- Utility function tests
-- Test fixtures and configuration
+Optional Addons:
+- Heroku Postgres Follower - For demonstrating follower pools
 
-Documentation:
-- Comprehensive README with setup and deployment instructions
-- CONTRIBUTING.md with development guidelines
-- MIT License
-- API documentation via FastAPI auto-generated docs
-
-Deployment:
-- Heroku-ready with Procfile and app.json
-- Support for Heroku Postgres Advanced with follower pools
-- Redis addon configuration for Celery
-- Heroku Managed Inference integration
-- Environment variable configuration
-
-This application serves as a demonstration of NGPG features including:
-- Compute/storage decoupling for independent scaling
-- Follower pools for improved read query performance
-- High availability with HA standby
-- pgvector for production ML/AI workloads
-
+The build should now succeed as the uv-heroku-buildpack automatically
+installs and configures uv without requiring manual PATH manipulation.

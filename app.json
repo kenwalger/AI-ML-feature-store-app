@@ -34,7 +34,8 @@
   },
   "addons": [
     "heroku-postgresql:essential-0",
-    "heroku-redis:mini"
+    "heroku-redis:mini",
+    "heroku-ai:basic"
   ]
 }
 

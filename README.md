@@ -154,19 +154,30 @@ heroku buildpacks:add heroku/python
 
 ### 4. Provision Add-ons
 
+**Required Add-ons:**
+
 ```bash
-# Postgres (Primary)
+# Postgres (Primary) - REQUIRED
 heroku addons:create heroku-postgresql:essential-0
 
-# Postgres Follower (if using follower pools)
-heroku addons:create heroku-postgresql:essential-0 --follow DATABASE_URL --name DATABASE_FOLLOWER
-
-# Redis
+# Redis - REQUIRED (for Celery)
 heroku addons:create heroku-redis:mini
 
-# Heroku Managed Inference (for Cohere embeddings)
+# Heroku Managed Inference - REQUIRED (for Cohere embeddings)
 heroku addons:create heroku-ai:basic
 ```
+
+**Optional Add-ons (Recommended for NGPG Demo):**
+
+```bash
+# Postgres Follower - OPTIONAL but recommended to showcase follower pools
+heroku addons:create heroku-postgresql:essential-0 --follow DATABASE_URL --name DATABASE_FOLLOWER
+
+# After creating follower, set the environment variable:
+heroku config:set FOLLOWER_DATABASE_URL=$(heroku config:get DATABASE_FOLLOWER_URL)
+```
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed addon setup instructions.
 
 ### 5. Set Environment Variables
 
@@ -182,10 +193,12 @@ git push heroku main
 ```
 
 The build process will:
-1. Use the `uv-heroku-buildpack` to install `uv`
+1. Use the `uv-heroku-buildpack` to automatically install `uv`
 2. Detect `pyproject.toml` or `requirements.txt`
 3. Use `uv` to install dependencies (much faster than pip)
 4. Build the application
+
+**Note**: The buildpack handles `uv` installation automatically - no manual setup needed!
 
 ### 7. Run Database Migrations
 
