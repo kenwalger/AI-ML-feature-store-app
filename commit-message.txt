@@ -1,30 +1,27 @@
-Fix PostgreSQL driver installation and database connection initialization
+Fix build warnings and integrate frontend serving
 
-This commit fixes the runtime error where SQLAlchemy couldn't load the
-PostgreSQL dialect plugin, and improves database connection handling
-with lazy initialization and better error handling.
+This commit addresses Heroku build warnings and sets up the frontend
+to be built and served by FastAPI.
 
-Runtime Fixes:
-- Implement lazy initialization for database engines to handle missing
-  psycopg2-binary gracefully
-- Add error handling for database connection creation
-- Fix postgres:// to postgresql:// URL conversion for SQLAlchemy 2.0
-- Update all database engine references to use lazy initialization
-  functions
+Build Configuration Fixes:
+- Remove uv.lock file to eliminate package manager conflict warning
+- Replace deprecated runtime.txt with .python-version (3.11)
+- Remove uv-heroku-buildpack (using native Heroku Python buildpack)
+- Add Node.js buildpack for frontend builds
+- Add package.json for frontend build script
 
-Database Connection Improvements:
-- Create engines lazily only when needed (not at module import time)
-- Add defensive error handling for missing database URLs
-- Improve follower database availability checking
-- Update metrics service to handle missing engines gracefully
-- Update toggle endpoint to properly check follower availability
+Frontend Integration:
+- Configure FastAPI to serve static frontend files from app/static
+- Add conditional root route: serves frontend if built, API info otherwise
+- Update Vite config to output to app/static directory
+- Update API client to use relative URLs in production
+- Add release phase to build frontend during deployment
 
-The issue was that database engines were being created at module import
-time, which caused failures if psycopg2-binary wasn't installed or
-DATABASE_URL wasn't set. With lazy initialization, the app can start
-even if the database isn't immediately available, and will create
-connections when actually needed.
+The app will now:
+1. Build the Vue.js frontend during Heroku deployment (release phase)
+2. Serve the frontend UI at the root route when built
+3. Fall back to API info JSON if frontend isn't built
+4. Serve API documentation at /docs and /redoc
 
-This should resolve the "Can't load plugin: sqlalchemy.dialects:postgres"
-error by ensuring psycopg2-binary is properly required and connections
-are created only when the database is actually needed.
+This resolves the build warnings and enables the full-stack application
+to work properly on Heroku.

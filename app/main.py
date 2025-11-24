@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import os
+from pathlib import Path
 
 from app.api.routes import ingestion, search, features, stats, toggle
 from app.database import init_db
@@ -34,6 +35,27 @@ app.include_router(features.router)
 app.include_router(stats.router)
 app.include_router(toggle.router)
 
+# Serve static files (frontend) if they exist
+static_dir = Path(__file__).parent.parent / "app" / "static"
+if static_dir.exists() and (static_dir / "index.html").exists():
+    app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+    
+    @app.get("/")
+    async def root():
+        """Serve frontend index.html"""
+        return FileResponse(str(static_dir / "index.html"))
+else:
+    @app.get("/")
+    async def root():
+        """Root endpoint - API info (frontend not built yet)"""
+        return {
+            "message": "AI/ML Feature Store API",
+            "version": "1.0.0",
+            "docs": "/docs",
+            "redoc": "/redoc",
+            "note": "Frontend not built. Run 'npm run build:frontend' to build the UI."
+        }
+
 
 @app.on_event("startup")
 async def startup_event():
@@ -43,17 +65,6 @@ async def startup_event():
         print("Database initialized successfully")
     except Exception as e:
         print(f"Warning: Database initialization failed: {e}")
-
-
-@app.get("/")
-async def root():
-    """Root endpoint"""
-    return {
-        "message": "AI/ML Feature Store API",
-        "version": "1.0.0",
-        "docs": "/docs",
-        "redoc": "/redoc"
-    }
 
 
 @app.get("/health")

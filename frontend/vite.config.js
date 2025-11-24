@@ -14,7 +14,13 @@ export default defineConfig({
   },
   build: {
     outDir: '../app/static',
-    emptyOutDir: true
-  }
+    emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        main: './index.html'
+      }
+    }
+  },
+  base: '/'
 })
 

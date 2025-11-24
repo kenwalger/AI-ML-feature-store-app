@@ -6,7 +6,7 @@
   "keywords": ["python", "fastapi", "postgresql", "pgvector", "ml", "ai"],
   "buildpacks": [
     {
-      "url": "https://github.com/astral-sh/uv-heroku-buildpack"
+      "url": "heroku/nodejs"
     },
     {
       "url": "heroku/python"
