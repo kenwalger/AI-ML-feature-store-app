@@ -1,0 +1,65 @@
+Initial commit: AI/ML Feature Store showcasing Heroku Next Generation PostgreSQL
+
+This commit establishes a production-ready ML feature store application
+demonstrating Heroku's Next Generation PostgreSQL (NGPG) capabilities,
+including pgvector for vector similarity search, follower pools,
+compute/storage decoupling, and high availability.
+
+Features:
+- Vector similarity search using pgvector extension
+- Follower pool toggle for demonstrating read replica performance
+- High-volume batch ingestion with async processing
+- Real-time performance metrics with Chart.js visualizations
+- Integration with Heroku Managed Inference (Cohere embeddings)
+- FastAPI backend with automatic Swagger/OpenAPI documentation
+- Vue.js 3 frontend with Bootstrap 5 UI
+- Celery workers for background task processing
+
+Backend (FastAPI):
+- Database models with pgvector support (1024-dimensional embeddings)
+- Primary and follower database connection management
+- API endpoints for ingestion, search, stats, and follower toggle
+- Cohere embedding service integration via Heroku AI
+- Mock data generator for cross-industry use cases
+- Performance metrics collection and tracking
+
+Frontend (Vue.js):
+- Interactive dashboard with Bootstrap styling
+- Follower pool toggle with real-time status
+- Feature ingestion panel with batch support
+- Vector similarity search interface
+- Performance metrics visualization with Chart.js
+- Responsive design for various screen sizes
+
+Infrastructure:
+- uv package manager integration for fast dependency installation
+- Heroku buildpack configuration for automated deployment
+- Celery + Redis for background job processing
+- Environment-based configuration management
+- Database initialization and migration support
+
+Testing:
+- pytest test suite with async support
+- API endpoint tests
+- Utility function tests
+- Test fixtures and configuration
+
+Documentation:
+- Comprehensive README with setup and deployment instructions
+- CONTRIBUTING.md with development guidelines
+- MIT License
+- API documentation via FastAPI auto-generated docs
+
+Deployment:
+- Heroku-ready with Procfile and app.json
+- Support for Heroku Postgres Advanced with follower pools
+- Redis addon configuration for Celery
+- Heroku Managed Inference integration
+- Environment variable configuration
+
+This application serves as a demonstration of NGPG features including:
+- Compute/storage decoupling for independent scaling
+- Follower pools for improved read query performance
+- High availability with HA standby
+- pgvector for production ML/AI workloads
+

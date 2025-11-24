@@ -1,0 +1,20 @@
+#!/bin/bash
+# Pre-compile script for Heroku deployment
+# This ensures uv is available and dependencies are installed
+
+set -e
+
+echo "-----> Installing uv..."
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Add uv to PATH
+export PATH="$HOME/.cargo/bin:$PATH"
+
+echo "-----> uv version:"
+uv --version
+
+echo "-----> Installing dependencies with uv..."
+uv pip install --system -r requirements.txt
+
+echo "-----> Pre-compile complete!"
+

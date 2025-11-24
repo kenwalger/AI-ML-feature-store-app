@@ -1,0 +1,40 @@
+{
+  "name": "AI/ML Feature Store - Heroku NGPG Demo",
+  "description": "Production-ready ML feature store showcasing Heroku Next Generation PostgreSQL",
+  "repository": "https://github.com/heroku/feature-store-demo",
+  "logo": "https://www.heroku.com/packs/media/images/heroku-logo-9f1e5435.svg",
+  "keywords": ["python", "fastapi", "postgresql", "pgvector", "ml", "ai"],
+  "buildpacks": [
+    {
+      "url": "https://github.com/astral-sh/uv-heroku-buildpack"
+    },
+    {
+      "url": "heroku/python"
+    }
+  ],
+  "env": {
+    "USE_FOLLOWER_POOL": {
+      "description": "Enable follower pool for read queries",
+      "value": "false"
+    },
+    "HEROKU_AI_MODEL_ID": {
+      "description": "Heroku Managed Inference model ID for embeddings",
+      "value": "cohere-embed-english-v3.0"
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    },
+    "worker": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "addons": [
+    "heroku-postgresql:essential-0",
+    "heroku-redis:mini"
+  ]
+}
+
