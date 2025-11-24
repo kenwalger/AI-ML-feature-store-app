@@ -21,6 +21,6 @@ export default defineConfig({
       }
     }
   },
-  base: '/'
+  base: '/static/'
 })
 

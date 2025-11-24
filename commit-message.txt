@@ -1,14 +1,12 @@
-Fix Bootstrap JS import in frontend build
+Fix static asset paths for frontend deployment
 
-The build was failing because Vite couldn't resolve the Bootstrap JS
-import. Bootstrap JS was being imported in main.js but wasn't installed
-as an npm package.
+The frontend was building successfully but assets (JS/CSS) weren't loading
+because of a path mismatch. Vite was building with base path '/' but FastAPI
+serves static files from '/static'.
 
 Fix:
-- Remove Bootstrap JS import from main.js (not needed as npm package)
-- Add Bootstrap JS via CDN script tag in index.html instead
-- This matches the CSS approach (already using CDN) and avoids build issues
+- Configure Vite to use '/static/' as the base path
+- Update FastAPI to properly mount the assets directory
+- Assets will now be served from /static/assets/... matching the HTML references
 
-Bootstrap functionality will work the same way, but now the build will
-succeed. The CDN approach is simpler and doesn't require bundling
-Bootstrap JS through Vite.
+The frontend should now load completely with all assets working correctly.

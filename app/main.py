@@ -38,6 +38,12 @@ app.include_router(toggle.router)
 # Serve static files (frontend) if they exist
 static_dir = Path(__file__).parent.parent / "app" / "static"
 if static_dir.exists() and (static_dir / "index.html").exists():
+    # Mount static assets directory
+    assets_dir = static_dir / "assets"
+    if assets_dir.exists():
+        app.mount("/static/assets", StaticFiles(directory=str(assets_dir)), name="static-assets")
+    
+    # Mount root static directory for other files
     app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
     
     @app.get("/")
