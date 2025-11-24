@@ -1,12 +1,14 @@
-Fix frontend build by including dev dependencies
+Fix Bootstrap JS import in frontend build
 
-The build was failing because vite (a dev dependency) wasn't being
-installed during the Heroku build process. Heroku sets NODE_ENV=production
-by default, which skips dev dependencies, but we need them for the build.
+The build was failing because Vite couldn't resolve the Bootstrap JS
+import. Bootstrap JS was being imported in main.js but wasn't installed
+as an npm package.
 
-Build Fix:
-- Update heroku-postbuild script to use `npm install --include=dev`
-- This ensures vite and other build tools are available during build
-- Production build still only includes production dependencies in final output
+Fix:
+- Remove Bootstrap JS import from main.js (not needed as npm package)
+- Add Bootstrap JS via CDN script tag in index.html instead
+- This matches the CSS approach (already using CDN) and avoids build issues
 
-The frontend will now build successfully on Heroku.
+Bootstrap functionality will work the same way, but now the build will
+succeed. The CDN approach is simpler and doesn't require bundling
+Bootstrap JS through Vite.
