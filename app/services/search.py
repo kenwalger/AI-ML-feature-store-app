@@ -38,13 +38,14 @@ class SearchService:
         
         # Perform vector similarity search using cosine distance
         # pgvector uses 1 - cosine_similarity as distance, so we want to order by distance ASC
+        # Use CAST() instead of :: to avoid SQLAlchemy parameter binding issues
         query = text("""
             SELECT id, name, description, category, price, created_at,
-                   1 - (embedding <=> :embedding::vector) as similarity
+                   1 - (embedding <=> CAST(:embedding AS vector)) as similarity
             FROM features
             WHERE embedding IS NOT NULL
-            AND (1 - (embedding <=> :embedding::vector)) >= :threshold
-            ORDER BY embedding <=> :embedding::vector
+            AND (1 - (embedding <=> CAST(:embedding AS vector))) >= :threshold
+            ORDER BY embedding <=> CAST(:embedding AS vector)
             LIMIT :limit
         """)
         
